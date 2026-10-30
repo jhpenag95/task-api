@@ -20,7 +20,7 @@ class TaskController extends Controller
      * Aqui se define una propiedad privada $taskService de tipo TaskService. Esta propiedad se utilizará para acceder a los métodos del servicio de tareas dentro del controlador.
      */
 
-    private TaskService $taskService;
+    private TaskService $taskService;//definiendo la propiedad privada $taskService de tipo TaskService
 
     public function __construct(TaskService $taskService)
     {

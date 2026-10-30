@@ -13,7 +13,7 @@ class StoreTaskRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return true; //permitiendo que cualquier usuario pueda realizar esta solicitud
     }
 
     /**
