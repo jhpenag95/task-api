@@ -40,7 +40,9 @@ class TaskController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store función para crear nuevas tareas. Recibe un StoreTaskRequest que valida los datos de entrada antes de crear la tarea.
+     * @param StoreTaskRequest $request|
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreTaskRequest $request)
     {

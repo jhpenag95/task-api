@@ -6,6 +6,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
 use Illuminate\Support\Facades\Log;
+use App\Jobs\EnviarNotificacionTareaJob;
 
 class LogTaskCreated
 {
@@ -22,10 +23,13 @@ class LogTaskCreated
      */
     public function handle(object $event): void
     {
+
         Log::info('Nueva tarea creada', [
             'id' => $event->task->id,
             'titulo' => $event->task->title,
             'estado' => $event->task->status,
         ]);
+
+        EnviarNotificacionTareaJob::dispatch($event->task);
     }
 }

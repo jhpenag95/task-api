@@ -16,6 +16,7 @@ use App\Models\Task;
 class TaskCreated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels; //traits que permiten despachar el evento, interactuar con sockets y serializar modelos
+    //Dispatchable: Permite despachar el evento utilizando el método estático dispatch(). por ejemplo, TaskCreated::dispatch($task);
 
     public Task $task; //propiedad publica para almacenar la tarea creada
 
