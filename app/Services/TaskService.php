@@ -4,12 +4,13 @@ namespace App\Services;
 
 use App\Models\Task;
 use App\Events\TaskCreated;
+use App\Models\User;
 
 class TaskService
 {
-    public function create(array $data): Task
+    public function create(array $data, User $user): Task
     {
-        $task = Task::create($data);
+        $task = $user->tasks()->create($data); //aqui se esta creando una nueva tarea asociada al usuario autenticado. Se utiliza la relación tasks() definida en el modelo User para crear la tarea y asociarla al usuario.
 
         TaskCreated::dispatch($task); //aqui se esta disparando el evento TaskCreated, pasando la tarea creada como parametro.Esta en al ruta app/Events/TaskCreated.php
 

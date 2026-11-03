@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory; //usamos el trait HasFact
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes; //agregando el trait SoftDeletes para habilitar soft deletes
 
+use App\Models\User; //Aqui se importa el modelo User para poder establecer la relación entre la tarea y el usuario que la creó.
+
 class Task extends Model
 {
     use HasFactory;
@@ -21,4 +23,9 @@ class Task extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function user() //Aqui se define la relación entre la tarea y el usuario que la creó; es decir, una tarea pertenece a un usuario.
+    {
+        return $this->belongsTo(User::class); //Aqui se establece que una tarea pertenece a un usuario. con belongsTo() se establece la relación de muchos a uno entre el modelo Task y el modelo User.
+    }
 }

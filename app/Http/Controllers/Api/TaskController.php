@@ -20,7 +20,7 @@ class TaskController extends Controller
      * Aqui se define una propiedad privada $taskService de tipo TaskService. Esta propiedad se utilizará para acceder a los métodos del servicio de tareas dentro del controlador.
      */
 
-    private TaskService $taskService;//definiendo la propiedad privada $taskService de tipo TaskService
+    private TaskService $taskService; //definiendo la propiedad privada $taskService de tipo TaskService
 
     public function __construct(TaskService $taskService)
     {
@@ -31,11 +31,13 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //retornando todas las tareas formateadas con el resource
         return TaskResource::collection(
-            Task::all()
+            $request->user()->tasks()
+                ->latest()
+                ->get()
         );
     }
 
@@ -47,7 +49,8 @@ class TaskController extends Controller
     public function store(StoreTaskRequest $request)
     {
         $task = $this->taskService->create( //aqui se esta llamando al metodo create del servicio de tareas, pasando los datos validados del request
-            $request->validated()
+            $request->validated(),
+            $request->user()
         );
 
         return response()->json([
