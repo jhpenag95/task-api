@@ -40,5 +40,8 @@ class EnviarNotificacionTareaJob implements ShouldQueue
         // );
         Log::info('Enviando notificación para la tarea: ' . $this->task->id); // Aquí puedes agregar la lógica para enviar la notificación, por ejemplo, enviar un correo electrónico o una notificación push.
 
+        Log::info('Notificación enviada para la tarea: ' . $this->task->id); // Aquí puedes agregar la lógica para enviar la notificación, por ejemplo, enviar un correo electrónico o una notificación push.
+
+        Log::warning('Advertencia: Notificación enviada para la tarea: ' . $this->task->id); // Aquí puedes agregar la lógica para enviar la notificación, por ejemplo, enviar un correo electrónico o una notificación push.
     }
 }
