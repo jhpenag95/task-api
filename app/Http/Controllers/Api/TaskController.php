@@ -12,7 +12,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // apuntando al resour
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
- // apuntando al trait AuthorizesRequests para poder usar el metodo authorize
+// apuntando al trait AuthorizesRequests para poder usar el metodo authorize
 
 class TaskController extends Controller
 {
@@ -30,14 +30,39 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Task::class); // aqui se esta llamando al metodo viewAny del servicio de tareas, pasando el modelo Task
+        $this->authorize('viewAny', Task::class); // aqui se esta llamando al metodo viewAny del servicio de tareas, pasando el modelo Task para verificar si el usuario tiene permiso para ver todas las tareas
+
+        $porPagina = min($request->query('por_pagina', 10), 100); // obteniendo el parametro por_pagina de la query string, si no existe se asigna el valor por defecto de 10
 
         // retornando todas las tareas formateadas con el resource
-        return TaskResource::collection(
-            $request->user()->tasks()
-                ->latest()
-                ->get()
-        );
+        $query = $request->user()
+            ->tasks()
+            ->latest();
+
+
+        //Agregar filtro por estado
+
+        if ($request->filled('status')) {
+
+            $query->where(
+                'status',
+                $request->status
+            );
+        }
+
+        //Agregar filtro por busqueda en el titulo de la tarea
+        if ($request->filled('search')) {
+
+            $query->where(
+                'title',
+                'like',
+                '%' . $request->search . '%'
+            );
+        }
+
+        $tasks = $query->paginate($porPagina);
+
+        return TaskResource::collection($tasks);
     }
 
     /**

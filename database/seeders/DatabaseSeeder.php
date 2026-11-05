@@ -25,17 +25,24 @@ class DatabaseSeeder extends Seeder
             ->each(function ($user) { //para cada usuario creado, se ejecuta la funcion anonima
 
                 Task::factory() //aqui se crean 10 tareas para cada usuario creado
-                    ->count(10)
+                    ->count(100)
                     ->for($user)
                     ->create();
             });
 
 
-         //Crear un usuario administrador fijo ->para poder ingresar al sistema con un usuario conocido y no tener que crear uno cada vez que se ejecute el seeder
+        //Crear un usuario administrador fijo ->para poder ingresar al sistema con un usuario conocido y no tener que crear uno cada vez que se ejecute el seeder
         User::create([
             'name' => 'Administrador',
             'email' => 'admin@test.com',
             'password' => bcrypt('12345678'),
         ]);
+
+
+        //crear muchas tareas para el usuario administrador fijo
+        Task::factory()
+            ->count(100)
+            ->for(User::where('email', 'admin@test.com')->first())
+            ->create();
     }
 }
