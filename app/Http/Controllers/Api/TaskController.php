@@ -3,41 +3,36 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest; // apuntando al servicio de tareas
+use App\Http\Resources\TaskResource; // apuntando al modelo y tabla tasks
+use App\Models\Task; // apuntando al request de validacion
+use App\Services\TaskService; // apuntando al request de validacion
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // apuntando al resource para formatear la respuesta
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-use App\Services\TaskService; //apuntando al servicio de tareas
-
-use App\Models\Task; //apuntando al modelo y tabla tasks
-use App\Http\Requests\StoreTaskRequest; //apuntando al request de validacion
-use App\Http\Requests\UpdateTaskRequest; //apuntando al request de validacion
-use App\Http\Resources\TaskResource; //apuntando al resource para formatear la respuesta
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests; //apuntando al trait AuthorizesRequests para poder usar el metodo authorize
+ // apuntando al trait AuthorizesRequests para poder usar el metodo authorize
 
 class TaskController extends Controller
 {
-
     /**
      * @var TaskService
-     * Aqui se define una propiedad privada $taskService de tipo TaskService. Esta propiedad se utilizará para acceder a los métodos del servicio de tareas dentro del controlador.
+     *                  Aqui se define una propiedad privada $taskService de tipo TaskService. Esta propiedad se utilizará para acceder a los métodos del servicio de tareas dentro del controlador.
      */
-
-    use AuthorizesRequests; //apuntando al servicio de tareas
+    use AuthorizesRequests; // apuntando al servicio de tareas
     // private TaskService $taskService; //definiendo la propiedad privada $taskService de tipo TaskService
 
-    public function __construct(private TaskService $taskService)
-    {
-        
-    }
-
+    public function __construct(private TaskService $taskService) {}
 
     /**
      * Función para mostrar todas las tareas del usuario autenticado. Recibe un Request que contiene la información del usuario autenticado.
      */
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Task::class); //aqui se esta llamando al metodo viewAny del servicio de tareas, pasando el modelo Task
+        $this->authorize('viewAny', Task::class); // aqui se esta llamando al metodo viewAny del servicio de tareas, pasando el modelo Task
 
-        //retornando todas las tareas formateadas con el resource
+        // retornando todas las tareas formateadas con el resource
         return TaskResource::collection(
             $request->user()->tasks()
                 ->latest()
@@ -47,31 +42,30 @@ class TaskController extends Controller
 
     /**
      * Store función para crear nuevas tareas. Recibe un StoreTaskRequest que valida los datos de entrada antes de crear la tarea.
-     * @param StoreTaskRequest $request|
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @return JsonResponse
      */
     public function store(StoreTaskRequest $request)
     {
-        $task = $this->taskService->create( //aqui se esta llamando al metodo create del servicio de tareas, pasando los datos validados del request
+        $task = $this->taskService->create( // aqui se esta llamando al metodo create del servicio de tareas, pasando los datos validados del request
             $request->validated(),
             $request->user()
         );
 
         return response()->json([
             'mensaje' => 'Tarea creada correctamente',
-            'data' => new TaskResource($task)
+            'data' => new TaskResource($task),
         ], 201);
     }
-
 
     /**
      * Función para mostrar una tarea específica. Recibe un Task que representa la tarea a mostrar.
      */
     public function show(Task $task)
     {
-        $this->authorize('view', $task); //aqui se esta llamando al metodo view del servicio de tareas, pasando la tarea a mostrar
+        $this->authorize('view', $task); // aqui se esta llamando al metodo view del servicio de tareas, pasando la tarea a mostrar
 
-        return new TaskResource($task); //retornando la tarea formateada con el resource
+        return new TaskResource($task); // retornando la tarea formateada con el resource
     }
 
     /**
@@ -79,17 +73,16 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
-        $this->authorize('update', $task); //aqui se esta llamando al metodo update del servicio de tareas, pasando los datos validados del request
+        $this->authorize('update', $task); // aqui se esta llamando al metodo update del servicio de tareas, pasando los datos validados del request
 
         $task = $this->taskService->update(
             $task,
             $request->validated()
         );
 
-
         return response()->json([
             'mensaje' => 'Tarea actualizada correctamente',
-            'data' => new TaskResource($task)
+            'data' => new TaskResource($task),
         ]);
     }
 
@@ -102,7 +95,7 @@ class TaskController extends Controller
         $this->taskService->delete($task);
 
         return response()->json([
-            'mensaje' => 'Tarea eliminada correctamente'
+            'mensaje' => 'Tarea eliminada correctamente',
         ]);
     }
 
@@ -115,7 +108,7 @@ class TaskController extends Controller
 
         return response()->json([
             'mensaje' => 'Tarea restaurada correctamente',
-            'data' => new TaskResource($task)
+            'data' => new TaskResource($task),
         ]);
     }
 }
