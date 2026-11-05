@@ -22,11 +22,11 @@ class TaskController extends Controller
      */
 
     use AuthorizesRequests; //apuntando al servicio de tareas
-    private TaskService $taskService; //definiendo la propiedad privada $taskService de tipo TaskService
+    // private TaskService $taskService; //definiendo la propiedad privada $taskService de tipo TaskService
 
-    public function __construct(TaskService $taskService)
+    public function __construct(private TaskService $taskService)
     {
-        $this->taskService = $taskService;
+        $this->authorizeResource(Task::class, 'task'); //aqui se esta llamando al metodo authorizeResource del trait AuthorizesRequests, pasando el modelo Task y el nombre del parametro de ruta 'task'
     }
 
 
@@ -35,7 +35,11 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Task::class); //aqui se esta llamando al metodo viewAny del servicio de tareas, pasando el modelo Task
+        // $this->authorize('viewAny', Task::class); //aqui se esta llamando al metodo viewAny del servicio de tareas, pasando el modelo Task
+
+        //ya no usamos $this->authorize porque estamos usando el metodo authorizeResource en el constructor, que se encarga de autorizar todas las acciones del controlador
+
+
         //retornando todas las tareas formateadas con el resource
         return TaskResource::collection(
             $request->user()->tasks()
@@ -68,7 +72,8 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        $this->authorize('view', $task); //aqui se esta llamando al metodo view del servicio de tareas, pasando la tarea a mostrar
+        // $this->authorize('view', $task); //aqui se esta llamando al metodo view del servicio de tareas, pasando la tarea a mostrar
+
         return new TaskResource($task); //retornando la tarea formateada con el resource
     }
 
@@ -77,7 +82,7 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
-        $this->authorize('update', $task); //aqui se esta llamando al metodo update del servicio de tareas, pasando los datos validados del request
+        // $this->authorize('update', $task); //aqui se esta llamando al metodo update del servicio de tareas, pasando los datos validados del request
 
         $task = $this->taskService->update(
             $task,
