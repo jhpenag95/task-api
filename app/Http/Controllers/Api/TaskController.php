@@ -36,8 +36,7 @@ class TaskController extends Controller
 
         // retornando todas las tareas formateadas con el resource
         $query = $request->user()
-            ->tasks()
-            ->latest();
+            ->tasks();
 
 
         //Agregar filtro por estado
@@ -59,6 +58,27 @@ class TaskController extends Controller
                 '%' . $request->search . '%'
             );
         }
+
+        $camposPermitidos = ['title', 'status', 'created_at', 'updated_at'];
+
+        $sort = $request->query('sort', 'created_at'); // obteniendo el parametro sort de la query string, si no existe se asigna el valor por defecto de created_at, sort es el campo por el cual se ordenaran los resultados, es decir el campo por el cual se ordenaran los resultados, es decir, si se quiere ordenar por titulo, status, fecha de creacion o fecha de actualizacion
+
+        $direction = $request->query('direccion', 'desc'); // obteniendo el parametro direccion de la query string, si no existe se asigna el valor por defecto de desc, direccion es la direccion en la cual se ordenaran los resultados, es decir, si se quiere ordenar de manera ascendente o descendente    
+
+        if (in_array($sort, $camposPermitidos)) { // verificando si el campo por el cual se quiere ordenar es un campo permitido, es decir, si se quiere ordenar por titulo, status, fecha de creacion o fecha de actualizacion
+            $sort = 'created_at';
+        }
+
+        if (! in_array($sort, $camposPermitidos)) { // verificando si el campo por el cual se quiere ordenar es un campo permitido, es decir, si se quiere ordenar por titulo, status, fecha de creacion o fecha de actualizacion
+            $direction = 'desc';
+        }
+
+
+        // Aplicando el ordenamiento a la consulta
+        $query->orderBy(
+            $sort,
+            $direction
+        );      
 
         $tasks = $query->paginate($porPagina);
 
