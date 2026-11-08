@@ -12,7 +12,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // apuntando al resour
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-// apuntando al trait AuthorizesRequests para poder usar el metodo authorize
+use App\Filters\TaskFilters;
 
 class TaskController extends Controller
 {
@@ -28,57 +28,17 @@ class TaskController extends Controller
     /**
      * Función para mostrar todas las tareas del usuario autenticado. Recibe un Request que contiene la información del usuario autenticado.
      */
-    public function index(Request $request)
+    public function index(Request $request, TaskFilters $filters)
     {
         $this->authorize('viewAny', Task::class); // aqui se esta llamando al metodo viewAny del servicio de tareas, pasando el modelo Task para verificar si el usuario tiene permiso para ver todas las tareas
 
         $porPagina = min($request->query('por_pagina', 10), 100); // obteniendo el parametro por_pagina de la query string, si no existe se asigna el valor por defecto de 10
 
         // retornando todas las tareas formateadas con el resource
-        $query = $request->user()
-            ->tasks();
+        $query = $request->user()->tasks()->getQuery(); // obteniendo la consulta de las tareas del usuario autenticado
 
-
-        //Agregar filtro por estado
-
-        if ($request->filled('status')) {
-
-            $query->where(
-                'status',
-                $request->status
-            );
-        }
-
-        //Agregar filtro por busqueda en el titulo de la tarea
-        if ($request->filled('search')) {
-
-            $query->where(
-                'title',
-                'like',
-                '%' . $request->search . '%'
-            );
-        }
-
-        $camposPermitidos = ['title', 'status', 'created_at', 'updated_at'];
-
-        $sort = $request->query('sort', 'created_at'); // obteniendo el parametro sort de la query string, si no existe se asigna el valor por defecto de created_at, sort es el campo por el cual se ordenaran los resultados, es decir el campo por el cual se ordenaran los resultados, es decir, si se quiere ordenar por titulo, status, fecha de creacion o fecha de actualizacion
-
-        $direction = $request->query('direccion', 'desc'); // obteniendo el parametro direccion de la query string, si no existe se asigna el valor por defecto de desc, direccion es la direccion en la cual se ordenaran los resultados, es decir, si se quiere ordenar de manera ascendente o descendente    
-
-        if (in_array($sort, $camposPermitidos)) { // verificando si el campo por el cual se quiere ordenar es un campo permitido, es decir, si se quiere ordenar por titulo, status, fecha de creacion o fecha de actualizacion
-            $sort = 'created_at';
-        }
-
-        if (! in_array($sort, $camposPermitidos)) { // verificando si el campo por el cual se quiere ordenar es un campo permitido, es decir, si se quiere ordenar por titulo, status, fecha de creacion o fecha de actualizacion
-            $direction = 'desc';
-        }
-
-
-        // Aplicando el ordenamiento a la consulta
-        $query->orderBy(
-            $sort,
-            $direction
-        );      
+        // Aplicando los filtros a la consulta
+        $filters->apply($query);
 
         $tasks = $query->paginate($porPagina);
 
